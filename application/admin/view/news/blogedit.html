@@ -1,0 +1,124 @@
+{include file="common/header" /}
+<link rel="stylesheet" href="/static/editor.md/css/editormd.min.css" />
+<style type="text/css" media="screen">
+	li{
+		list-style: list-item !important;
+	}
+	.editormd-code-toolbar select{
+		display: initial;
+	}
+</style>
+<div class="layui-fluid">
+    <form class="layui-form" action="">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">编辑内容</div>
+                    <div class="layui-card-body">
+                        <div class="layui-form-item">
+			    <input type="hidden" name="id" value="{$data.id}">
+                            <input type="text" name="title" required lay-verify="required" value="{$data.title}" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-upload">
+                                <button type="button" class="layui-btn" id="test1">上传封面</button>
+                                <input type="hidden" name="thumb">
+                                <div class="layui-upload-list">
+                                    <img class="layui-upload-img" id="demo1" width="100" height="auto">
+                                    <p id="demoText"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <!-- <label class="layui-form-label">内容：</label>   -->
+                            <div id="editor">
+                                <!-- Tips: Editor.md can auto append a `<textarea>` tag -->
+                                <textarea style="display:none;" name="content">{$data->profile->content}</textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-layout-admin">
+                            <div class="layui-input-block">
+                                <div class="layui-footer" style="left: 0;">
+                                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="common/footer"}
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="/static/editor.md/editormd.min.js"></script>
+<script type="text/javascript">
+	var editor = editormd("editor", {
+		placeholder : "尽情发挥吧",
+        width: "100%",
+        height: "500",
+        // markdown: "xxxx",     // dynamic set Markdown text
+        path: "/static/editor.md/lib/", // Autoload modules mode, codemirror, marked... dependents libs path
+        saveHTMLToTextarea : true,
+    });
+</script>
+<script>
+layui.use(['form', 'upload', 'laydate', 'layedit'], function() {
+    var form = layui.form;
+    var $ = layui.$;
+    var upload = layui.upload;
+    var laydate = layui.laydate;
+    var layedit = layui.layedit;
+    layedit.set({
+        uploadImage: {
+            url: 'uploadImage',
+            type: 'post' //默认post
+        },
+        autoSync: true,
+    });
+
+    //监听提交    
+    form.on('submit(formDemo)', function(data) {  	
+        var con = JSON.stringify(data.field)
+        $.post('blogedit', { data: con }, function(data) {
+            if (data.code == 200) {
+                layer.msg(data.msg, { icon: 6 });
+                
+                $('.layui-btn-primary').click();
+            }
+        });
+        return false;
+    });
+    var uploadInst = upload.render({
+        elem: '#test1',
+        url: 'upload',
+        field: 'thumb',
+        size: '204800',
+        exts: 'jpg|png|gif|bmp|jpeg',
+        before: function(obj) {
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result) {
+                $('#demo1').attr('src', result); //图片链接（base64）
+            });
+        },
+        done: function(res) {
+            //如果上传失败
+            if (res.code > 0) {
+                return layer.msg('上传失败');
+            } else {
+                $('input[name=cover]').val(res.data);
+            }
+            //上传成功
+        },
+        error: function() {
+            //演示失败状态，并实现重传
+            var demoText = $('#demoText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function() {
+                uploadInst.upload();
+            });
+        }
+    });
+});
+</script>

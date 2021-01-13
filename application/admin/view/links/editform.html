@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>友情链接</title>
+    <link rel="stylesheet" href="/static/admin/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list"
+     style="padding: 20px 30px 0 0;">
+    <input type="hidden" name="id">
+    <div class="layui-form-item">
+        <label class="layui-form-label">友链标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" placeholder="请输入标题" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>    
+    <div class="layui-form-item">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="url" lay-verify="required" placeholder="请输入链接" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-block">
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test1">上传图片</button>
+                <div class="layui-upload-list">
+                    <input type="hidden" name="images">
+                    <img class="layui-upload-img" id="demo1" style="width:100%">
+                    <p id="demoText"></p>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit"
+               value="确认添加">
+        <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit"
+               value="确认编辑">
+    </div>
+</div>
+
+<script src="/static/admin/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'upload'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var upload = layui.upload;
+        //监听提交
+        form.on('submit(layuiadmin-app-form-submit)', function (data) {
+            var field = data.field; //获取提交的字段
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+
+            //提交 Ajax 成功后，关闭当前弹层并重载表格
+            $.post('linksedit',{data:field},function(res){
+                if (res.code == 200){
+                    layer.msg(res.msg);
+                    parent.layui.table.reload('content-list'); //重载表格
+                    parent.layer.close(index); //再执行关闭
+                } else{
+                    layer.msg(res.msg);
+                }
+            })
+        });
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1',
+            url: 'imgup',
+            field: 'image',
+            size: '204800',
+            exts: 'jpg|png|gif|bmp|jpeg',
+            before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            },
+            done: function (res) {
+                //如果上传失败
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }else {
+                    $('input[name=images]').val(res.data);
+                }
+                //上传成功
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

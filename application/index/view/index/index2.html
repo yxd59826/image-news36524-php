@@ -1,0 +1,57 @@
+{include file="common/header" /}
+<div class="main wrap container">
+    <div class="row">
+        <div class="col-md-8 main-content">
+            <div class="posts-wrap">
+                <ul class="feedlist">
+                    {volist name="news" id="vo"}
+                    <li class="clearfix">
+                        <div class="list_con">
+                            <div class="title">
+                                <h2>
+                                    <a href="/content/{$vo.id}" target="_blank" alt="{$vo.title}">{$vo.title}</a>
+                                </h2>
+                            </div>
+                            <div class="summary">
+                                {$vo->profile->content | strip_tags | msubstr=0,100}
+                            </div>
+                            {if $vo.catid!=6}
+                            <div class="newsimgs">
+                                {volist name=":getpics($vo->profile->content)" id="imgs" offset="0" length='4'}
+                                <span class="images-link news3-images-link">{$imgs | raw}</span>
+                                {/volist}
+                            </div>
+                            {/if}
+                            <dl class="list_userbar">
+                                <dt></dt>
+                                <dd class="tag">
+                                    <a href="#">{$vo.catname}</a>
+                                </dd>
+                                <div class="interval"></div>
+                                <dd class="time">{:formatTime(strtotime($vo.create_time))}</dd>
+                                <div class="floatR">
+                                    <dd>
+                                        <span>阅读</span>
+                                        <span>
+                                                {if $vo->views>1000}
+                                                    {:sprintf( "%.1f ",$vo.views/1000)}K
+                                                {elseif $vo->views>10000 /}
+                                                    {:sprintf( "%.1f ",$vo.views/10000)}W
+                                                {else /}
+                                                    {$vo->views}
+                                                {/if}
+                                            </span>
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </li>
+                    {/volist}
+                </ul>
+                {$page|raw}
+            </div>
+        </div>
+        {include file="common/slider" /}
+    </div>
+</div>
+{include file="common/footer" /}

@@ -1,0 +1,51 @@
+<aside class="col-md-4 sidebar">
+    <div class="tags">
+        <img src="{$ads.images}">
+    </div>
+    <div class="gu">
+        <div class="hot-list">
+            <h2 class="title">周人气总榜</h2>
+            <ul class="list">
+                {volist name="hots" id="vo"}
+                <li class="item">
+                    <span class="num {if $i<5}highlight{/if}">{$i}</span>
+                    <div class="title-au">
+                        <div>
+                            <a href="/content/{$vo.id}" target="_blank">
+                                <p class="story-title">{$vo.title}</p>
+                            </a>
+                        </div>
+                        <span class="ticket">
+                            {if $i<5}<ion-icon name="flame" class="gua">
+                                </ion-icon>{/if}
+                                {if $vo.views > 1000}{:sprintf( "%.1f ",$vo.views/1000)}k{else /}{$vo.views}{/if}
+                                <span style="font-size: 12px;">热度</span>
+                        </span>
+                    </div>
+                </li>
+                {/volist}
+            </ul>
+        </div>
+        <div class="ads">
+            <script data-ad-client="ca-pub-8835407278271489" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        </div>
+        <div class="links-list">
+            <h2 class="title">友情链接</h2>
+            <ul class="frendlist">
+                {volist name="links" id="vo"}
+                <li><a href="{$vo.url}"><img src="{$vo.images}" width="32" height="32">{$vo.title}</a></li>
+                {/volist}
+            </ul>
+        </div>
+    </div>
+</aside>
+<script type="text/javascript">
+if (/(iPhone|iPad|iPod|iOS|Android)/i.test(navigator.userAgent)) { //移动端
+
+}else{
+    $(".gu").fixedScroll({
+        offset:'15px'
+    })
+}
+
+</script>

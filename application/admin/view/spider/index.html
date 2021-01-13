@@ -1,0 +1,41 @@
+{include file="common/header" /}
+<div class="layui-fluid">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">爬取内容</div>
+            <div class="layui-card-body">
+                <form class="layui-form" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">链接地址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="openurl" lay-verify="openurl" id="openurl" autocomplete="off" placeholder="请输入链接" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                          <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即获取</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+ </div>
+{include file="common/footer" /}
+<script type="text/javascript">
+layui.use(['form', 'upload', 'laydate', 'layedit'], function() {
+    var form = layui.form;
+    var $ = layui.$;
+    var upload = layui.upload;
+    var layedit = layui.layedit;
+	form.on('submit(demo1)',function(data){
+        var valinput = $("#openurl").val();        
+        var xinput = valinput.replace(/group\//, "a");        
+        $.post('geturl',{openurl:xinput},function(res){
+            console.log(res);
+            $("#openurl").val('');
+        })
+        return false;
+    })    
+});
+</script>

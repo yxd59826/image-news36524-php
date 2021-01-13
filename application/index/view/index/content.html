@@ -1,0 +1,21 @@
+{include file="common/header" /}
+    <div class="main wrap container">
+        <div class="row">            
+            <div class="col-md-8">
+                <div class="posts-wrap">
+                    <div class="article-area">
+                        <article>
+                            <h1 class="article-title">{$data.title | raw | substr=0,84}</h1>
+                            <div class="article-content">
+                                {$data->profile->content | raw}
+                            </div>
+                        </article>                        
+                    </div>  
+                    {include file="common/comments" /}                  
+                </div>
+
+            </div>
+            {include file="common/slider" /}
+        </div>
+    </div>	
+{include file="common/footer" /}

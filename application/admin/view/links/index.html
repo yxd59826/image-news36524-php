@@ -1,0 +1,118 @@
+{include file="common/header" /}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">友情链接</div>
+                <div class="layui-card-body">
+                    <div style="padding-bottom: 10px;">
+                        <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+                        <button class="layui-btn layuiadmin-btn-list" data-type="add">添加</button>
+                    </div>
+                    <table id="content-list" lay-filter="content-list"></table>
+                    <script type="text/html" id="barDemo">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+					</script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="common/footer" /}
+<script>
+layui.use(['table', 'form', 'rate', 'layer', 'jquery'], function() {
+    var table = layui.table;
+    var $ = layui.$;
+    var form = layui.form;
+    table.render({
+        elem: '#content-list',
+        url: 'getData',
+        page: true,
+        cols: [
+            [
+                { type: 'checkbox' },
+                { field: 'id', title: 'ID', width: 80, sort: true },
+                { field: 'title', title: '网站' },
+                { field: 'url', title: '地址' },
+                { field: 'create_time', title: '创建时间', width: 180 },
+                { field: 'update_time', title: '更新时间', width: 180 },
+                { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
+            ]
+        ]
+    });
+    table.on('tool(content-list)', function(obj) {
+        var data = obj.data;
+        if (obj.event === 'del') {
+            layer.confirm('真的删除行么', function(index) {
+                obj.del();
+                layer.close(index);
+            });
+        } else if (obj.event === 'edit') {
+            layer.open({
+                type: 2,
+                title: '添加文章',
+                content: 'editform',
+                maxmin: true,
+                area: ['450px', '500px'],
+                btn: ['确定', '取消'],
+                success: function(layero, index){
+				    var body = layer.getChildFrame('body', index);
+				    var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+				    body.find('input[name=id]').val(data.id);
+				    body.find('input[name=title]').val(data.title);
+				    body.find('input[name=url]').val(data.url);
+				    body.find('input[name=images]').val(data.images);
+				    body.find('#demo1').attr('src',data.images);
+				},
+                yes: function(index, layero) {
+                    //点击确认触发 iframe 内容中的按钮提交
+                    var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                    submit.click();
+                }
+            });
+        }
+    });
+    var $ = layui.$,
+        active = {
+            batchdel: function() {
+                var checkStatus = table.checkStatus('content-list'),
+                    checkData = checkStatus.data; //得到选中的数据
+
+                if (checkData.length === 0) {
+                    return layer.msg('请选择数据');
+                }
+                layer.confirm('确定删除吗？', function(index) {
+                    $.post('linksdel', { data: checkData }, function(res) {
+                        if (res.code == 200) {
+                            layer.msg('已删除');
+                            table.reload('content-list');
+                        }
+                    })
+
+                });
+            },
+            add: function() {
+                layer.open({
+                    type: 2,
+                    title: '添加文章',
+                    content: 'listform',
+                    maxmin: true,
+                    area: ['450px', '450px'],
+                    btn: ['确定', '取消'],
+                    yes: function(index, layero) {
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                        submit.click();
+                    }
+                });
+            }
+
+        };
+    $('.layui-btn.layuiadmin-btn-list').on('click', function() {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+})
+</script>

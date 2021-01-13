@@ -1,0 +1,74 @@
+<div class="comments-box" id="commentvue">
+    <div class="comments-form">
+        <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2188118499,572678618&fm=26&gp=0.jpg" alt="头像" class="avatar">
+        <div class="input-box">
+            <textarea class="comments-textarea" placeholder="写下你的评论..." v-model="message"></textarea>
+            <input type="hidden" value="{$data.id}" name="tid">
+            <div>
+                <div>
+                    <div class="comments-tools">
+                        <button type="button" class="sub-button combutton" v-on:click="postco">
+                            <span>发布</span>
+                        </button>
+                        <button type="button" class="qx-button combutton">
+                            <span>取消</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="comments-list-box" v-if="commentslist">
+         <div class="comments-list-item" v-for="(item,index) in commentslist">
+			<a href="#">
+				<img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1959736240,4053771765&fm=26&gp=0.jpg" alt="" class="avatar">
+			</a>
+			<div class="comments-content">
+				<div class="comments-username">{{item.nickname}}</div>
+				<div class="comments-timeline"><span>{{index+1}}楼</span> {{item.create_time}}</div>
+				<div class="comments-content-con">{{item.content}}</div>
+				<div class="comments-content-action">
+					<span class="zan" role="button" tabindex="-1" aria-label="点赞"><ion-icon name="thumbs-up"></ion-icon> 赞</span>
+					<span class="hui" role="button" tabindex="-1" aria-label="回复"><ion-icon name="text"></ion-icon> 回复</span>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+	let tid = {$data.id};
+	var app = new Vue({
+		el: '#commentvue',
+		data: {
+			commentslist: [],
+			tid: tid,
+			message: ''
+		},	
+		created: function () {
+			this.getco()
+		},
+		methods:{
+			getco:function(){
+				axios.post('/api/getcomments',{params: {tid: this.tid}})
+				.then(res => {
+					this.commentslist = res.data.data
+				})
+				.catch((e) => {
+					console.log('获取数据失败');
+				});
+			},
+			postco:function(){
+				axios.post('/api/postcomment',{params: {mm:this.message,tid: this.tid}})
+				.then(res => {
+					console.log('数据是:', res.data);
+					this.getco();					
+				})
+				.catch((e) => {
+					console.log('获取数据失败');
+				});
+			}
+		}
+	})
+</script>

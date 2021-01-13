@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图库-NEWS36524</title>
+    <!-- <link rel="stylesheet" type="text/css" href="/static/gallery/css/normalize.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" href="/static/gallery/css/default.css"> -->
+    <!-- <link href="/static/gallery/css/animated-masonry-gallery.css" rel="stylesheet" type="text/css" /> -->
+    <link rel="stylesheet" href="/static/layui/css/layui.css">    
+</head>
+
+<body>
+    <div class="htmleaf-container">
+        <header class="htmleaf-header">
+            <div class="searchwrap">
+                <div class="searchinputbox">
+                    <div class="searchicon">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </div>
+                    <div class="searchInputbox">
+                        <input type="text" autocapitalize="off" autocorrect="off" autocomplete="off" class="serchtext" name="searchBoxInput" placeholder="搜索你喜欢的.." style="" value="">
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div id="gallery" class="appcontent" style="height: 900px; overflow: auto;">
+            <div id="gallery-content">
+                <div id="gallery-content-center">
+                </div>
+            </div>
+        </div>
+        
+    </div>       
+    <script src="/static/layui/layui.js"></script>
+    <script type="text/javascript">
+    layui.use('flow', function() {
+        var flow = layui.flow;
+        var $ = layui.jquery;
+        flow.load({
+            elem: '#gallery-content-center' //流加载容器
+            ,isAuto: true
+            ,isLazyimg: true
+            ,mb: 200
+            ,done: function(page, next) { //执行下一页的回调
+                //模拟数据插入
+                setTimeout(function() {
+                    var lis = [];
+                    $.get('/index/gallery/getlist?page=' + page, function(res) {
+                        layui.each(res.data, function(index, item) {
+                            lis.push('<div class="grid-item"><a href="/photos/' + item.id + '"><img src="https://image.news36524.com/' + item.thumb + '" class="all studio" alt="' + item.title + '" /></a></div>');
+                        });
+
+                        //执行下一页渲染，第二参数为：满足“加载更多”的条件，即后面仍有分页
+                        //pages为Ajax返回的总页数，只有当前页小于总页数的情况下，才会继续出现加载更多
+                        next(lis.join(''), page < res.pages);                        
+                    })
+                }, 500);
+            }
+        });
+        
+    });
+    </script>
+
+</body>
+
+</html>
