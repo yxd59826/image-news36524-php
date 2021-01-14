@@ -33,7 +33,7 @@ class News extends Adminbase
             $sitecontent = getUrlContent($url);        
             # preg_match_all('/(?<=jsonp1\\()[^\\)]+/', $sitecontent, $match);
             preg_match_all('/<h1 id=bd_article_title>[\s\S]*?<\/h1>/', $sitecontent, $title);
-            dump($title[0]);
+//            dump($title[0]);
             if (count($title)){
                 if($title[0]){
                     preg_match_all('/<div class=content>[\s\S]*?<\/article>/', $sitecontent, $match);
